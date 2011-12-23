@@ -1,23 +1,45 @@
 <?php
-/**
- * Implementation of hook_init().
- */
-function region_filter_init() {
 
-}
-/*
+/**
+ * Implementation of hook_nodeapi().
+ */
+
 function region_filter_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  global $user, $base_url;
   switch ($op) {
 
     case 'view':
-       $region = getRegion();
-        foreach($node->taxonomy as $term) {
-
-          if($term->name != $region ) {
-            $link = 'http://' . $term->name . '.thedelimagazine.com/' . drupal_get_path_alias("node/$node->nid", $path_language = '');
- 
+    if(!drupal_is_front_page()) {
+ //      if($user->uid == 1) {       
+        $region = getRegion();
+        $other = array('boston', 'burlington', 'connecticut', 'portland-me', 'providence');
+        $national = 'national';
+        $count = count($node->taxonomy);
+        
+        $terms = array();
+        foreach($node->taxonomy as $term) {    
+          $terms[$term->name] = $term->name;
         }
+                //     print 'debug:<pre>'. check_plain(print_r($link  , 1)) . '</pre>'; 
+        
+        /*  ++++++++case 2+++++++++ */ 
+        if($count == 2 && in_array('national', $terms)) {
+          unset($terms['national']);
+          $value = array_shift($terms) ;
+          if($region != $value) {
+            $link = 'http://' . $value . '.thedelimagazine.com/' . drupal_get_path_alias("node/$node->nid", $path_language = '');
+            drupal_goto($link, $query = NULL, $fragment = NULL, $http_response_code = 301);
+          }         
+        }
+        /* ++ END case 2++*/     
+        /*  ++++++++case 3+++++++++ */ 
+        elseif($count > 2  && in_array('national', $terms) && $region != 'national') {                  
+          $link = 'http://national.thedelimagazine.com/' . drupal_get_path_alias("node/$node->nid", $path_language = '');;
+          drupal_goto($link, $query = NULL, $fragment = NULL, $http_response_code = 301);     
+        }
+         /* ++ END case 3++*/       
+       }
+  //  }
       break;
   }
 }
-*/
