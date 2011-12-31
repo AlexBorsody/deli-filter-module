@@ -48,14 +48,34 @@ function region_filter_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
 	}
 	/*END case 1 new england*/
 	
-	
-         /*++++++++case 2+++++++++ not  working with $count ==2  so doing redirect if count > 2*/
-	 //los angeles is only term not the same as subdomain so we will make an exception here, redirect will not work for los angeles unless we figure out how to convert it from region map. 
+ 
+	       /*  ++++++++case 3 national+++++++++  changed logic, but  we get the same result*/ 
+	 //if( in_array('national', $terms) &&  in_array('nashville', $terms)&&  in_array('nyc', $terms) &&  in_array('boston, $terms)&& $region != 'national' )  THIS DOES NOT WORK but logic is accurate because if ever this combination redirect to National
+	if($count > 10  && in_array('national', $terms)  && $region != 'national' ) {    //this works              
+          $link = 'http://national.thedelimagazine.com/' . drupal_get_path_alias("node/$node->nid", $path_language = '');
+          drupal_goto($link, $query = NULL, $fragment = NULL, $http_response_code = 301);     
+	}
+         /* ++ END case 3 national++*/
 	 
+	
+	 
+	
+	
+      
+     
+  
+        else {
+	
+	 
+	 
+	 	
+         /*++++++++case 2+++++++++*/
+	
+		
+          if($count == 2 && in_array('national', $terms) && !in_array('washington', $terms) && arg(1) !== '8210' && is_numeric(arg(1))) {  //remove washington washington redirects to cdofthemonth for some reason.
+          unset($terms['national']);
 
-          if($count == 2 && in_array('national', $terms) && is_numeric(arg(1))) {  /*works fine, but still a problem with front page (redirected from front page to other node, because front page uses node with terms)*/
-          unset($terms['national']);        
-          $value = array_shift($terms) ;
+          $value = array_shift($terms) ;//returns value of what is left in the array
           if($value == 'los angeles') {
             $value = 'la';
           }      
@@ -66,29 +86,37 @@ function region_filter_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
      
               $link = 'http://' . $value . '.thedelimagazine.com/' . drupal_get_path_alias("node/$node->nid", $path_language = '');
               //   print 'debug :<pre>'. check_plain(print_r($region, 1)) . '</pre>';
-              //drupal_goto($link, $query = NULL, $fragment = NULL, $http_response_code = 301);
+            drupal_goto($link, $query = NULL, $fragment = NULL, $http_response_code = 301);
           }         
         }
 
         /* ++ END case 2++*/
        
-	
-	
-	
-     
-        /*  ++++++++case 3 national+++++++++  changed logic, but  we get the same result*/ 
-        else {
-	 //if( in_array('national', $terms) &&  in_array('nashville', $terms)&&  in_array('nyc', $terms) &&  in_array('boston, $terms)&& $region != 'national' )  THIS DOES NOT WORK but logic is accurate because if ever this combination redirect to National
-	if($count > 10  && in_array('national', $terms)  && $region != 'national' ) {    //this works              
-          $link = 'http://national.thedelimagazine.com/' . drupal_get_path_alias("node/$node->nid", $path_language = '');;
-          drupal_goto($link, $query = NULL, $fragment = NULL, $http_response_code = 301);     
-	}
-         /* ++ END case 3 national++*/
 	 
-	
+	 
+	 
 	 
          }
      }
       break;
   }
 }
+
+/*
+ If has washington tag, redirects to cd of the month
+ 
+ if is the frontpage also redirects to cd of the month and ads in washington array in second/duplicate array
+ 
+
+*/
+
+
+
+
+
+
+
+
+
+
+
